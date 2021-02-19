@@ -13,28 +13,74 @@ namespace mp3_V3 {
     }
     */
 
+    function zeroAdding(trackNumber: number): string {
+        let s = trackNumber+"";
+        while (s.length < 4) {
+            s = "0" + s;
+        }
+        return s;
+    }
+
     //% block
     export function playSong(trackNumber: number){
-        let hexArray: string[] = ["0x05","0xA2","0x00","0x01"];
-        writeBuffer(hexArray);
-        /* 
-        bufr.setNumber(NumberFormat.Int8LE, 0, 0x7e); //Start Code
-        bufr.setNumber(NumberFormat.Int8LE, 1, 0x05); //Length
-        bufr.setNumber(NumberFormat.Int8LE, 2, 0xA2); //Command
-        bufr.setNumber(NumberFormat.Int8LE, 3, 0x00); //High Order
-        bufr.setNumber(NumberFormat.Int8LE, 4, 0x01); //Low Order
-        bufr.setNumber(NumberFormat.Int8LE, 5, 0xA8); //Check-Code (Low Bite of: Lenght + Command + Data (Volume Value))
-        bufr.setNumber(NumberFormat.Int8LE, 6, 0xEF); //End Code
-         
+
+        let splitString = zeroAdding(trackNumber).split("");
+        // +48 because The Ascii 0 is 48 in Dec which will be convertet to Hex autoatically when writing to buffer
+        let digit00 = parseInt(splitString[0]) + 48;
+        let digit01 = parseInt(splitString[1]) + 48;
+        let digit02 = parseInt(splitString[2]) + 48;
+        let digit03 = parseInt(splitString[3]) + 48;
+
+        // Convert digits to string to write them into the array
+        let sDigit00 = digit00.toString();
+        let sDigit01 = digit01.toString();
+        let sDigit02 = digit02.toString();
+        let sDigit03 = digit03.toString();
         
-        serial.writeBuffer(bufr);
-        control.waitMicros(200000);
-        */
+        let hexArray: string[] = ["0x07","0xA3", sDigit00, sDigit01, sDigit02, sDigit03];
+        writeBuffer(hexArray);
+
+    }
+
+    //% block
+    export function pauseSong(){
+        let hexArray: string[] = ["0x03","0xAA"];
+        writeBuffer(hexArray);
+    }
+
+     //% block
+    export function stopSong(){
+        let hexArray: string[] = ["0x03","0xAB"];
+        writeBuffer(hexArray);
+    }
+
+     //% block
+    export function nextSong(){
+        let hexArray: string[] = ["0x03","0xAC"];
+        writeBuffer(hexArray);
+    }
+
+     //% block
+    export function previousSong(){
+        let hexArray: string[] = ["0x03","0xAD"];
+        writeBuffer(hexArray);
+    }
+
+    //% block
+    export function playMode(mode: number){
+        if (mode > 3 || mode < 0){
+            mode = 0;
+        }
+
+        let sMode = mode.toString(); 
+
+        let hexArray: string[] = ["0x04","0xAF", sMode];
+        writeBuffer(hexArray);
     }
 
     function writeBuffer(hexArray: string[]){
         let bufferLength: number = hexArray.length + 3 // 3 (Start Code, Check Code, End Code)
-        let bufr = pins.createBuffer(bufferLength);
+        bufr = pins.createBuffer(bufferLength);
 
         let checkCode: number = 0; // Is calculatet in the for loop (Lenght + Command + Data)
              
@@ -51,9 +97,7 @@ namespace mp3_V3 {
         control.waitMicros(200000);
     }
 
-    
-
-    let bufr = pins.createBuffer(1);
+    let bufr
     
     // MP3 Module set to Pin 0
     serial.redirect(
