@@ -1,6 +1,7 @@
 input.onButtonPressed(Button.A, function () {
     songNr += -1
     mp3_V3.previousSong()
+    mp3_V3.querySongname()
 })
 input.onGesture(Gesture.LogoUp, function () {
     mode += 1
@@ -23,6 +24,7 @@ input.onButtonPressed(Button.AB, function () {
 input.onButtonPressed(Button.B, function () {
     songNr += 1
     mp3_V3.nextSong()
+    mp3_V3.querySongname()
 })
 input.onGesture(Gesture.Shake, function () {
     mp3_V3.stopSong()
@@ -35,5 +37,5 @@ input.onGesture(Gesture.Shake, function () {
         `)
 })
 let mode = 0
-let songNr = 0
-basic.showNumber(songNr)
+let songNr = 1
+mp3_V3.queryNumberOfTracks()

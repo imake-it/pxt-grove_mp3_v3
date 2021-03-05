@@ -3,15 +3,11 @@ namespace mp3_V3 {
 
     //% block
     //% volume.min=0 volume.max=31
-    /**    export function setVolume(volume: number){
-        bufr.setNumber(NumberFormat.Int8LE, 0, 0x7e); //Start Code
-        bufr.setNumber(NumberFormat.Int8LE, 1, 0x04); //Length
-        bufr.setNumber(NumberFormat.Int8LE, 2, 0xAE); //Command
-        bufr.setNumber(NumberFormat.Int8LE, 3, 0x1F); //Volume Value
-        bufr.setNumber(NumberFormat.Int8LE, 4, 0x00); //Check-Code (Low Bite of: Lenght + Command + Data (Volume Value))
-        bufr.setNumber(NumberFormat.Int8LE, 5, 0xEF); //End Code
+    export function setVolume(volume: number){
+        let stringVol: string = volume.toString();
+        let hexArray: string[] = ["0x04","0xAE", stringVol];
+        writeBuffer(hexArray);
     }
-    */
 
     function zeroAdding(trackNumber: number): string {
         let s = trackNumber+"";
@@ -97,7 +93,31 @@ namespace mp3_V3 {
         control.waitMicros(200000);
     }
 
-    let bufr
+    //QUERY Funktionen 
+
+    //% block
+    export function querySongname(){
+    
+        let hexArray: string[] = ["0x03","0xCB"];
+        writeBuffer(hexArray);
+        
+        let songName = serial.readBuffer(32);
+        
+    }
+
+    //% block
+    export function queryNumberOfTracks(){
+
+        let hexArray: string[] = ["0x03","0xC5"];
+        writeBuffer(hexArray);
+
+        let numberOfTracks = serial.readBuffer(3);
+
+        let num = numberOfTracks.toString();
+        basic.showString("num");
+    }
+
+    let bufr;
     
     // MP3 Module set to Pin 0
     serial.redirect(
@@ -106,18 +126,4 @@ namespace mp3_V3 {
     BaudRate.BaudRate9600
     );
 
-    //initializeSDCard();
-    /**
-    function initializeSDCard(){
-        bufr.setNumber(NumberFormat.Int8LE, 0, 0x7e);
-        bufr.setNumber(NumberFormat.Int8LE, 1, 0x04);
-        bufr.setNumber(NumberFormat.Int8LE, 2, 0xd2);
-        bufr.setNumber(NumberFormat.Int8LE, 3, 0x01);
-        bufr.setNumber(NumberFormat.Int8LE, 4, 0xd7);
-        bufr.setNumber(NumberFormat.Int8LE, 5, 0xef);
-        
-        serial.writeBuffer(bufr);
-        control.waitMicros(200000);
-    }
-*/
 }
