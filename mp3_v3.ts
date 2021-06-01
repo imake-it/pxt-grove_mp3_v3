@@ -1,5 +1,14 @@
+enum Dir{
+    PIANO,
+    BRASS,
+    DRUMS,
+    MUSIC,
+    GUITR,
+}
+
 //% color="#000099" weight=105 icon="\uf144"
 namespace mp3_V3 {
+    let dirName:string;
 
     //% block
     //% volume.min=0 volume.max=31
@@ -17,6 +26,7 @@ namespace mp3_V3 {
         return s;
     }
 
+    /**Play Song in Root-Directory */
     //% block
     export function playSong(trackNumber: number){
 
@@ -36,6 +46,37 @@ namespace mp3_V3 {
         let hexArray: string[] = ["0x07","0xA3", sDigit00, sDigit01, sDigit02, sDigit03];
         writeBuffer(hexArray);
 
+    }
+
+    /**Play Song in specific Folder */
+    //% block
+    export function playFolderSong(trackNumber: number){
+
+        let splitFolderName = dirName.split("");
+        let char00 = splitFolderName[0];
+        let char01 = splitFolderName[1];
+        let char02 = splitFolderName[2];
+        let char03 = splitFolderName[3];
+        let char04 = splitFolderName[4];
+
+        let splitString = zeroAdding(trackNumber).split("");
+        // +48 because The Ascii 0 is 48 in Dec which will be convertet to Hex autoatically when writing to buffer
+        let digit00 = 80;
+        let digit01 = 73;
+        let digit02 = 65;
+        let digit03 = 78;
+        let digit04 = 79;
+
+        // Convert digits to string to write them into the array
+        let sDigit00 = digit00.toString();
+        let sDigit01 = digit01.toString();
+        let sDigit02 = digit02.toString();
+        let sDigit03 = digit03.toString();
+        let sDigit04 = digit04.toString();
+        
+        /**Hardcoded ASCII-VAlues for Forlder "PIANO" and Index 5 (5th Song copied to SD-Card) */
+        let hexArray :string[] = ["0x0A","0xA4", sDigit00, sDigit01, sDigit02, sDigit03, sDigit04, "0x00", "0x05"];
+        writeBuffer(hexArray);
     }
 
     //% block
@@ -85,13 +126,42 @@ namespace mp3_V3 {
             bufr.setNumber(NumberFormat.Int8LE, i+1, hexNumber);
             checkCode += hexNumber;
         }
-
+        
         bufr.setNumber(NumberFormat.Int8LE, 0, 0x7e); //Start Code
         bufr.setNumber(NumberFormat.Int8LE, bufferLength - 2, checkCode);
         bufr.setNumber(NumberFormat.Int8LE, bufferLength -1 , 0xef); //End Code
         serial.writeBuffer(bufr);
         control.waitMicros(200000);
+
+        //DELETE
+       /*  let test = bufr.getNumber(NumberFormat.Int8LE, 2)
+        basic.showString(test.toString()) */
+
+
     }
+
+    //% block
+    export function chooseFolder(folder: Dir){
+
+        switch(folder){
+            case Dir.PIANO: dirName = "PIANO";
+            break;
+            case Dir.BRASS: dirName = "BRASS";
+            break;
+            case Dir.DRUMS: dirName = "DRUMS";
+            break;
+            case Dir.MUSIC: dirName = "MUSIC";
+            break;
+            case Dir.GUITR: dirName = "GUITR";
+            break;
+        }
+    }
+
+
+
+
+
+
 
     //QUERY Funktionen 
 
@@ -117,12 +187,35 @@ namespace mp3_V3 {
         basic.showString("num");
     }
 
+    
+    /**
+    * This is the quick-help
+    */
+    //% block="Test Query"
+    export function queryNumberOfTracksTest(){
+
+    let hexArray: string[] = ["0x03","0xC5"];
+    bufr = pins.createBuffer(5)
+
+    bufr.setNumber(NumberFormat.Int8LE, 0, 0x7e); //Start Code
+    bufr.setNumber(NumberFormat.Int8LE, 1, 0x03);
+    bufr.setNumber(NumberFormat.Int8LE, 2, 0xc5); //End Code
+    bufr.setNumber(NumberFormat.Int8LE, 3, 0xc8);
+    bufr.setNumber(NumberFormat.Int8LE, 4, 0xef);
+    serial.writeBuffer(bufr);
+    control.waitMicros(200000);
+    let readBuf = bufr.getNumber(NumberFormat.Int8LE, 2)
+  
+   
+   /*  return readBuf.toString() */
+    }
+
     let bufr;
     
     // MP3 Module set to Pin 0
     serial.redirect(
-    SerialPin.P14,
-    SerialPin.P0,
+    SerialPin.P14, //TX (Transmitt)
+    SerialPin.P0,  //RX (Receive)
     BaudRate.BaudRate9600
     );
 
