@@ -1,14 +1,14 @@
 enum Dir{
-    PIANO,
-    BRASS,
-    DRUMS,
-    MUSIC,
-    GUITR,
+    KLAVIER,
+    BLECHBLASINSTRUMENT,
+    SCHLAGZEUG,
+    MUSIK,
+    GITARRE,
 }
 
 //% color="#000099" weight=105 icon="\uf144"
 namespace mp3_V3 {
-    let dirName:string;
+    let dirName: string;
 
     //% block
     //% volume.min=0 volume.max=31
@@ -60,7 +60,7 @@ namespace mp3_V3 {
         let char04 = splitFolderName[4];
 
         let splitString = zeroAdding(trackNumber).split("");
-        // +48 because The Ascii 0 is 48 in Dec which will be convertet to Hex autoatically when writing to buffer
+        // Convert folder name into ASCII
         let digit00 = 80;
         let digit01 = 73;
         let digit02 = 65;
@@ -144,20 +144,36 @@ namespace mp3_V3 {
     export function chooseFolder(folder: Dir){
 
         switch(folder){
-            case Dir.PIANO: dirName = "PIANO";
+            case Dir.KLAVIER: dirName = "PIANO";
             break;
-            case Dir.BRASS: dirName = "BRASS";
+            case Dir.BLECHBLASINSTRUMENT: dirName = "BRASS";
             break;
-            case Dir.DRUMS: dirName = "DRUMS";
+            case Dir.SCHLAGZEUG: dirName = "DRUMS";
             break;
-            case Dir.MUSIC: dirName = "MUSIC";
+            case Dir.MUSIK: dirName = "MUSIC";
             break;
-            case Dir.GUITR: dirName = "GUITR";
+            case Dir.GITARRE: dirName = "GUITR";
             break;
+            
         }
     }
 
+    function asciiConverter(): number{
+        let alphabetNumbers :number[] = [65, 66, 67, 68, 69, 70, 71, 72, 73, 74];
+        let alphabetChars :string[] = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"];
 
+        let dirNameArray = dirName.split("");
+
+        for (let i = 0; i < dirNameArray.length; i ++){
+           for (let j = 0; j < alphabetChars.length; j ++){
+               if (i == j){
+                   return alphabetNumbers[j];
+               }
+               
+            } 
+        }return 0;
+
+    }
 
 
 
@@ -181,10 +197,11 @@ namespace mp3_V3 {
         let hexArray: string[] = ["0x03","0xC5"];
         writeBuffer(hexArray);
 
-        let numberOfTracks = serial.readBuffer(3);
+        let numberOfTracks = serial.readLine();
 
-        let num = numberOfTracks.toString();
-        basic.showString("num");
+        let numTr = numberOfTracks();
+
+        basic.showString(numTr);        
     }
 
     
