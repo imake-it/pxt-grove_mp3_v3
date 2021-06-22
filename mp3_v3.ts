@@ -8,7 +8,7 @@ enum Dir{
 
 //% color="#000099" weight=105 icon="\uf144"
 namespace mp3_V3 {
-    
+    let dirName: string;
 
     //% block
     //% volume.min=0 volume.max=31
@@ -52,7 +52,7 @@ namespace mp3_V3 {
     //% block
     export function playFolderSong(trackNumber: number){
 
-        let splitFolderName = ["a","b","c","d","e"]
+        let splitFolderName = dirName.split("");
         let char00 = splitFolderName[0];
         let char01 = splitFolderName[1];
         let char02 = splitFolderName[2];
@@ -60,23 +60,11 @@ namespace mp3_V3 {
         let char04 = splitFolderName[4];
 
         let splitString = zeroAdding(trackNumber).split("");
-       
         // Convert folder name into ASCII
-        let digit00 = 80;
-        let digit01 = 73;
-        let digit02 = 65;
-        let digit03 = 78;
-        let digit04 = 79;
-
-        // Convert digits to string to write them into the array
-        let sDigit00 = digit00.toString();
-        let sDigit01 = digit01.toString();
-        let sDigit02 = digit02.toString();
-        let sDigit03 = digit03.toString();
-        let sDigit04 = digit04.toString(); 
+        let asciiArray: number[] = asciiConverter();
         
         /**Hardcoded ASCII-VAlues for Forlder "PIANO" and Index 5 (5th Song copied to SD-Card) */
-        let hexArray :string[] = ["0x0A","0xA4", sDigit00, sDigit01, sDigit02, sDigit03, sDigit04, "0x00", "0x05"];
+        let hexArray :string[] = ["0x0A","0xA4", asciiArray[0].toString(), asciiArray[1].toString(), asciiArray[2].toString(), asciiArray[3].toString(), asciiArray[4].toString(), "0x00", "0x05"];
         writeBuffer(hexArray);
     }
 
@@ -120,7 +108,7 @@ namespace mp3_V3 {
         let bufferLength: number = hexArray.length + 3 // 3 (Start Code, Check Code, End Code)
         bufr = pins.createBuffer(bufferLength);
 
-        let checkCode: number = 0; // Is calculated in the for loop (Length + Command + Data)
+        let checkCode: number = 0; // Is calculatet in the for loop (Lenght + Command + Data)
              
         for (let i = 0; i < hexArray.length; i ++){
             let hexNumber = parseInt(hexArray[i]);
@@ -143,8 +131,6 @@ namespace mp3_V3 {
 
     //% block
     export function chooseFolder(folder: Dir){
-        
-        let dirName :string = "MUSIC";
 
         switch(folder){
             case Dir.KLAVIER: dirName = "PIANO";
@@ -160,28 +146,30 @@ namespace mp3_V3 {
             
         }
 
-        call asciiConverter();
+       
     }
 
     function asciiConverter(): number[]{
         let alphabetNumbers :number[] = [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90];
         let alphabetChars :string[] = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 
-        //let dirNameArray :string[] = dirName.split("");
-        let dirNameArray :string[] = ["A", "B", "C", "D", "E"];
-        let dirAsciiArray :number[]; 
+        //dirName = Global-Variable
+        let dirNameArray = dirName.split("");
+        let dirNumberArray: number[] = [];
 
         for (let i = 0; i < dirNameArray.length; i ++){
            for (let j = 0; j < alphabetChars.length; j ++){
-               if (i == j){
-                   dirAsciiArray[i] = alphabetNumbers[j];
-               }   
+               if (dirNameArray[i] == alphabetChars[j]){
+                   dirNumberArray.push(alphabetNumbers[j]);
+               }              
             } 
         }
-        
-        return dirAsciiArray;
-
+        return dirNumberArray;
     }
+
+
+
+
 
     //QUERY Funktionen 
 
@@ -227,8 +215,9 @@ namespace mp3_V3 {
     control.waitMicros(200000);
     let readBuf = bufr.getNumber(NumberFormat.Int8LE, 2)
   
+   
+   /*  return readBuf.toString() */
     }
-
 
     let bufr;
     
