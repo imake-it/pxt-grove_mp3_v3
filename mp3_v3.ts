@@ -52,19 +52,24 @@ namespace mp3_V3 {
     //% block
     export function playFolderSong(trackNumber: number){
 
-        let splitFolderName = dirName.split("");
+       /*  let splitFolderName = dirName.split("");
         let char00 = splitFolderName[0];
         let char01 = splitFolderName[1];
         let char02 = splitFolderName[2];
         let char03 = splitFolderName[3];
-        let char04 = splitFolderName[4];
+        let char04 = splitFolderName[4]; */
 
+        //Song-Number
         let splitString = zeroAdding(trackNumber).split("");
+        let sDigit01 = splitString[0] + splitString[1]
+        let sDigit02 = splitString[2] + splitString[3]
+
+        //Folder-Name
         // Convert folder name into ASCII
         let asciiArray: number[] = asciiConverter();
         
         /**Hardcoded ASCII-VAlues for Forlder "PIANO" and Index 5 (5th Song copied to SD-Card) */
-        let hexArray :string[] = ["0x0A","0xA4", asciiArray[0].toString(), asciiArray[1].toString(), asciiArray[2].toString(), asciiArray[3].toString(), asciiArray[4].toString(), "0x00", "0x05"];
+        let hexArray :string[] = ["0x0A","0xA4", asciiArray[0].toString(), asciiArray[1].toString(), asciiArray[2].toString(), asciiArray[3].toString(), asciiArray[4].toString(), sDigit01, sDigit02];
         writeBuffer(hexArray);
     }
 
@@ -222,10 +227,10 @@ namespace mp3_V3 {
     let bufr;
     
     // MP3 Module set to Pin 0
-    serial.redirect(
+    /* serial.redirect(
     SerialPin.P14, //TX (Transmitt)
     SerialPin.P0,  //RX (Receive)
     BaudRate.BaudRate9600
-    );
+    ); */
 
 }
